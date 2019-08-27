@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'data.dart' as globals;
 import 'ui/themes.dart';
 import 'ui/pages-slideBarStatusSmartbag.dart';
 import 'route.dart';
@@ -17,16 +17,17 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
+double mainGlobalHeigthScreen;
 // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlay)
 class _MainPageState extends State<MainPage> {
   final GlobalKey<ScaffoldState> _scaffoldFinalKey =
       new GlobalKey<ScaffoldState>();
   double paddingTop;
   int _selectedIndex = 0;
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    
     });
   }
 
@@ -67,12 +68,13 @@ class _MainPageState extends State<MainPage> {
       centerTitle: true,
     );
 
-    double heightReceivedAppBar = receivedAppBar.preferredSize.height;
+    mainGlobalHeigthScreen = receivedAppBar.preferredSize.height;
     double heightScreenCalc = (MediaQuery.of(context).size.height -
         paddingTop -
-        (heightReceivedAppBar * 2));
+        (mainGlobalHeigthScreen * 2));
     double widthScreelCalc = (MediaQuery.of(context).size.width);
-
+    globals.heightGlobal = heightScreenCalc; 
+    globals.widthGlobal = widthScreelCalc;
     return Scaffold(
         key: _scaffoldFinalKey,
         appBar: receivedAppBar,
@@ -89,21 +91,21 @@ class _MainPageState extends State<MainPage> {
       type: BottomNavigationBarType.fixed,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-            icon: Icon(Icons.receipt), title: Text("Página Inicial")),
+            icon: Icon(Icons.home), title: Text("Página Inicial")),
         BottomNavigationBarItem(
-          icon: Icon(Icons.business),
+          icon: Icon(Icons.list),
           title: Text('Catálogo'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.school),
+          icon: Icon(Icons.threesixty),
           title: Text('Artigos'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.school),
+          icon: Icon(Icons.history),
           title: Text('Histórias'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.school),
+          icon: Icon(Icons.image),
           title: Text('Smartbag'),
         ),
       ],
