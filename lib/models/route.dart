@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'pages/artigos.dart';
-import 'pages/catalogo.dart';
-import 'pages/historias.dart';
-import 'pages/index.dart';
-import 'pages/smartbag.dart';
+import 'package:house_of_caju/screens/artigosPageScreen/artigos.dart';
+import 'package:house_of_caju/screens/catalogoPageScreen/catalogo.dart';
+import 'package:house_of_caju/screens/historiasPageScreen/historias.dart';
+import 'package:house_of_caju/screens/indexPageScreen/index.dart';
+import 'package:house_of_caju/screens/smartbagPageScreen/smartbag.dart';
 
 
-Widget routeCallPage(index, heightScreenCalc, widthScreelCalc) {
-  
+Widget routeCallPage(index) {
+  print(index);
   switch (index) {
     case 0:
       {
@@ -38,8 +38,7 @@ Widget routeCallPage(index, heightScreenCalc, widthScreelCalc) {
       {
         return Container(
           color: Colors.red,
-          height: heightScreenCalc,
-          width: widthScreelCalc,
+        
           child: Text("$index"),
         );
       }
