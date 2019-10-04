@@ -6,8 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<File> getFile() async {
   final directory = await getApplicationDocumentsDirectory();
-
-  return File("${directory.path}/random142.json");
+  return File("${directory.path}/random147.json");
 }
 
 saveData() async {
@@ -19,11 +18,12 @@ saveData() async {
 Future<Map<String, dynamic>> readData() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
-    String fuckPath = "${directory.path}/random142.json";
+    String fuckPath = "${directory.path}/random147.json";
     bool received;
     final file = await getFile();
     received = await File(fuckPath).exists();
     print(received);
+    
     if (received == false) {
       globals.results = {
         'social': [

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:house_of_caju/models/data.dart' as globals;
 import 'package:house_of_caju/theme/style.dart';
@@ -17,7 +16,6 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
   @override
   void initState() {
     super.initState();
-
     readData().then((data) {
       setState(() {
         globals.results = data;
@@ -78,87 +76,134 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
             width: 300.0,
             child: ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: globals.results['social'].length,
+                itemCount: globals.results['social'].length + 1,
                 itemBuilder: (context, index) {
-                  return Slidable(
-                    actionPane: SlidableDrawerActionPane(),
-                    child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12),
-                        ),
-                        height: 50.0,
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.only(left: 5.0, right: 5.0),
-                              child: Icon(Icons.add_alarm,
-                                  size: 20.0,
-                                  color: (globals.results['social'][index]
-                                          ['status'])
-                                      ? Colors.black
-                                      : Colors.black38),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Container(
-                                child: Text(
-                                  globals.results['social'][index]['name'],
-                                  style: TextStyle(
-                                      fontFamily: 'Publica Sans',
-                                      fontWeight: FontWeight.w400,
-                                      color: (globals.results['social'][index]
-                                              ['status'])
-                                          ? Colors.black
-                                          : Colors.black38),
-                                ),
-                                alignment: Alignment.center,
+                  
+                  print(globals.results['social'].length);
+                  if (index != globals.results['social'].length) {
+                    return Slidable(
+                      actionPane: SlidableDrawerActionPane(),
+                      child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black12),
+                          ),
+                          height: 50.0,
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(left: 5.0, right: 5.0),
+                                child: Icon(Icons.add_alarm,
+                                    size: 20.0,
+                                    color: (globals.results['social'][index]
+                                            ['status'])
+                                        ? Colors.black
+                                        : Colors.black38),
                               ),
-                            ),
-                            Expanded(
+                              Expanded(
                                 flex: 2,
                                 child: Container(
-                                  child: Switch(
-                                    key: ValueKey(index),
-                                    activeColor: colorPink,
-                                    inactiveThumbColor: colorBlack10,
-                                    inactiveTrackColor: colorBlack10,
-                                    value: globals.results['social'][index]
-                                        ['status'],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        globals.results['social'][index]
-                                            ['status'] = value;
-                                      });
-                                    },
+                                  child: Text(
+                                    globals.results['social'][index]['name'],
+                                    style: TextStyle(
+                                        fontFamily: 'Publica Sans',
+                                        fontWeight: FontWeight.w400,
+                                        color: (globals.results['social'][index]
+                                                ['status'])
+                                            ? Colors.black
+                                            : Colors.black38),
                                   ),
-                                ))
-                          ],
-                        )),
-                    actions: <Widget>[
-                      IconSlideAction(
-                        caption: 'Archive',
-                        color: Colors.blue,
-                        icon: Icons.archive,
-                        onTap: () => print('Archive'),
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                              Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    child: Switch(
+                                      key: ValueKey(index),
+                                      activeColor: colorPink,
+                                      inactiveThumbColor: colorBlack10,
+                                      inactiveTrackColor: colorBlack10,
+                                      value: globals.results['social'][index]
+                                          ['status'],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          globals.results['social'][index]
+                                              ['status'] = value;
+                                          saveData();
+                                        });
+                                      },
+                                    ),
+                                  ))
+                            ],
+                          )),
+                      actions: <Widget>[
+                        IconSlideAction(
+                          caption: 'Archive',
+                          color: Colors.blue,
+                          icon: Icons.archive,
+                          onTap: () => print('Archive'),
+                        ),
+                        IconSlideAction(
+                          caption: 'Share',
+                          color: Colors.indigo,
+                          icon: Icons.share,
+                          onTap: () => print('Archive'),
+                        ),
+                      ],
+                      secondaryActions: <Widget>[
+                        IconSlideAction(
+                          caption: 'Deletar',
+                          color: Colors.red,
+                          icon: Icons.delete,
+                          onTap: () {
+                            setState(() {
+                              globals.results['social'].removeAt(index);
+                              saveData();
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  } else {
+                    return FlatButton(
+                      key: UniqueKey(),
+                      onPressed: () {
+                        callFlutuableListApps();
+                        setState(() {
+                          globals.results['social']
+                              .add({'name': 'Facebook', 'status': false});
+                          saveData();
+                        });
+                      },
+                      child: Container(
+                        height: 35.0,
+                        decoration: new BoxDecoration(
+                            border:
+                                Border.all(color: colorBlack10, width: 2.0)),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  height: 35.0,
+                                  child: Text(
+                                    "foda-se",
+                                    style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: colorBlack10,
+                                        fontFamily: 'Publica Sans',
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      IconSlideAction(
-                        caption: 'Share',
-                        color: Colors.indigo,
-                        icon: Icons.share,
-                        onTap: () => print('Archive'),
-                      ),
-                    ],
-                    secondaryActions: <Widget>[
-                      IconSlideAction(
-                        caption: 'Deletar',
-                        color: Colors.red,
-                        icon: Icons.delete,
-                        onTap: (){
-                          print(index);
-                        },
-                      ),
-                    ],
-                  );
+                    );
+                  }
                 }),
           ),
         ],
@@ -166,6 +211,7 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
     );
   }
 
+  Widget callFlutuableListApps() {}
   getExpandedStatus() {
     return Expanded(
         child: Container(
