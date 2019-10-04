@@ -14,41 +14,51 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
   bool localValue = false;
   Map<String, dynamic> allResults = Map<String, dynamic>();
 
+  @override
+  void initState() {
+    super.initState();
+
+    readData().then((data) {
+      setState(() {
+        globals.results = data;
+        print(globals.results.runtimeType);
+        // globals.results = json.encode(data);
+      });
+    });
+  }
+
   List<String> itemsList = List<String>.generate(100, (i) => "Item $i");
   @override
   Widget build(BuildContext context) {
- 
-    if (globals.results == null) {
-      getJsonAppsNotification();
-    }
-
-    return Container(
-      width: globals.widthGlobal,
-      height: globals.heightGlobal,
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: 50.0,
+    return (globals.results == null)
+        ? Center(child: CircularProgressIndicator())
+        : Container(
             width: globals.widthGlobal,
-            child: Text(
-              "SMARTBAG",
-              style: TextStyle(
-                  fontFamily: 'Publica Sans',
-                  fontWeight: FontWeight.w800,
-                  fontSize: 23.0),
+            height: globals.heightGlobal,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: 50.0,
+                  width: globals.widthGlobal,
+                  child: Text(
+                    "SMARTBAG",
+                    style: TextStyle(
+                        fontFamily: 'Publica Sans',
+                        fontWeight: FontWeight.w800,
+                        fontSize: 23.0),
+                  ),
+                  alignment: Alignment.center,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    getExpandedNotifications(),
+                    getExpandedStatus(),
+                  ],
+                )
+              ],
             ),
-            alignment: Alignment.center,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              getExpandedNotifications(),
-              getExpandedStatus(),
-            ],
-          )
-        ],
-      ),
-    );
+          );
   }
 
   getExpandedNotifications() {
@@ -118,7 +128,6 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                                       setState(() {
                                         globals.results['social'][index]
                                             ['status'] = value;
-                                     
                                       });
                                     },
                                   ),
@@ -144,7 +153,9 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                         caption: 'Deletar',
                         color: Colors.red,
                         icon: Icons.delete,
-                        onTap: () => saveData(),
+                        onTap: (){
+                          print(index);
+                        },
                       ),
                     ],
                   );
@@ -285,6 +296,3 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
     ));
   }
 }
-
- 
-
