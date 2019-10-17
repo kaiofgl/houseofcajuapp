@@ -5,9 +5,7 @@ import 'package:house_of_caju/screens/historiasPageScreen/historias.dart';
 import 'package:house_of_caju/screens/indexPageScreen/index.dart';
 import 'package:house_of_caju/screens/smartbagPageScreen/smartbag.dart';
 
-
 Widget routeCallPage(index) {
-  print(index);
   switch (index) {
     case 0:
       {
@@ -38,7 +36,6 @@ Widget routeCallPage(index) {
       {
         return Container(
           color: Colors.red,
-        
           child: Text("$index"),
         );
       }

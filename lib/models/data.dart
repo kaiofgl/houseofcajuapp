@@ -6,9 +6,11 @@ import 'package:flutter/widgets.dart';
 double heightGlobal;
 double widthGlobal;
 int selectedIndexGlobal;
+int countItensActives;
 BuildContext globalBuildContextMainScreen;
 
 bool valueStateLedNotification = false;
 bool valueStateSmartbagBluetooth = false;
 
 var results;
+

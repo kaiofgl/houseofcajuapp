@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:house_of_caju/theme/style.dart';
 import 'package:house_of_caju/models/route.dart';
+import 'package:launcher_assist/launcher_assist.dart';
 import 'components/components.dart';
 import 'package:house_of_caju/models/data.dart' as globals;
+import 'package:house_of_caju/screens/smartbagPageScreen/smartbag.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -20,6 +22,16 @@ class _MainScreenState extends State<MainScreen> {
   double paddingTop;
 
   int auxReceivedGlobalItem;
+  @override
+  void initState() {
+    super.initState();
+
+    LauncherAssist.getAllApps().then((apps) {
+      setState(() {
+        installedApps = apps;
+      });
+    });
+  }
 
   void onItemTapped(int index) {
     setState(() {
@@ -53,17 +65,29 @@ class _MainScreenState extends State<MainScreen> {
       actions: <Widget>[
         Padding(
           padding: EdgeInsets.only(right: 10.0),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              textDirection: TextDirection.rtl,
-              color: colorBlack10,
-              size: 30.0,
-            ),
-            onPressed: () {
-              return _scaffoldFinalKey.currentState.openEndDrawer();
-            },
-          ),
+          child: (selectedIndex != 4)
+              ? IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    textDirection: TextDirection.rtl,
+                    color: colorBlack10,
+                    size: 30.0,
+                  ),
+                  onPressed: () {
+                    return _scaffoldFinalKey.currentState.openEndDrawer();
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.help,
+                    textDirection: TextDirection.ltr,
+                    color: colorBlack10,
+                    size: 30.0,
+                  ),
+                  onPressed: () {
+                    return _scaffoldFinalKey.currentState.openEndDrawer();
+                  },
+                ),
         )
       ],
       leading: Icon(
@@ -91,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
         body: Center(
           child: routeCallPage(globals.selectedIndexGlobal),
         ),
-        endDrawer: callEndDrawerCreate(),
+        endDrawer: (selectedIndex != 4) ? callEndDrawerCreate() : null,
         bottomNavigationBar: callBottomNavigation());
   }
 
