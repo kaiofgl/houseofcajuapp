@@ -1,11 +1,14 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:house_of_caju/components/bluetooth/components/DiscoveryPage.dart';
 import 'package:house_of_caju/models/data.dart' as globals;
 import 'package:house_of_caju/theme/style.dart';
 import 'components/components.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:animated_card/animated_card.dart';
 import 'dart:math' as math;
 
 class StateSmartBagPageRoute extends StatefulWidget {
@@ -130,7 +133,8 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                 itemCount: globals.results['social'].length + 1,
                 itemBuilder: (context, index) {
                   if (index != globals.results['social'].length) {
-                    return Slidable(
+                    return AnimatedCard(
+                        child: Slidable(
                       controller: slidableController,
                       actionPane: SlidableDrawerActionPane(),
                       child: Container(
@@ -189,14 +193,10 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                         IconSlideAction(
                           caption: 'Cores',
                           color: Color.fromARGB(
-                              globals.results['social'][index]
-                                  ['alpha'],
-                              globals.results['social'][index]
-                                  ['red'],
-                              globals.results['social'][index]
-                                  ['green'],
-                              globals.results['social'][index]
-                                  ['blue']),
+                              globals.results['social'][index]['alpha'],
+                              globals.results['social'][index]['red'],
+                              globals.results['social'][index]['green'],
+                              globals.results['social'][index]['blue']),
                           icon: Icons.palette,
                           onTap: () {
                             showDialog(
@@ -227,7 +227,7 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                           },
                         ),
                       ],
-                    );
+                    ));
                   }
                 }),
           ),
@@ -371,7 +371,7 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                   child: Container(
                     alignment: Alignment.center,
                     child: Text(
-                      "SMARTBAG",
+                      "BLUETOOTH",
                       style: TextStyle(
                           fontFamily: 'Publica Sans',
                           fontWeight: FontWeight.w700,
@@ -387,9 +387,23 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                     inactiveTrackColor: colorBlack10,
                     value: globals.valueStateSmartbagBluetooth,
                     onChanged: (value) {
-                      setState(() {
-                        globals.valueStateSmartbagBluetooth = value;
-                        globals.valueStateLedNotification = value;
+                      future() async {
+                        if (value) {
+                          print(value);
+                          await FlutterBluetoothSerial.instance.requestEnable();
+                        } else {
+                          print(value);
+                          print("value");
+                          await FlutterBluetoothSerial.instance
+                              .requestDisable();
+                        }
+                      }
+
+                      future().then((_) {
+                        setState(() {
+                          globals.valueStateSmartbagBluetooth = value;
+                          globals.valueStateLedNotification = value;
+                        });
                       });
                     },
                   ),
@@ -397,6 +411,57 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
               ],
             ),
           ),
+          Divider(
+            color: Colors.black26,
+            height: 0,
+          ),
+          Column(
+            children: <Widget>[
+              Container(
+                child: FlatButton(
+                  key: UniqueKey(),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ScreenDart();
+                        });
+                  },
+                  child: Container(
+                    height: 35.0,
+                    decoration: new BoxDecoration(
+                        border: Border.all(color: colorBlack10, width: 2.0)),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              height: 35.0,
+                              child: Text(
+                                "NOVA SMARTBAG",
+                                style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: colorBlack10,
+                                    fontFamily: 'Publica Sans',
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              alignment: Alignment.center,
+                            ),
+                          ),
+                          Container(
+                            height: 35.0,
+                            width: 35.0,
+                            child: Icon(Icons.bluetooth_searching),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     ));
@@ -680,59 +745,60 @@ class _MyDialogClassState extends State<MyDialogClass> {
         child: ListView.builder(
             itemCount: installedApps.length,
             itemBuilder: (context, index) {
-              return Slidable(
-                  actionPane: SlidableDrawerActionPane(),
-                  child: Column(
-                    children: <Widget>[
-                      Divider(
-                        color: Colors.black26,
-                        height: 0,
-                      ),
-                      Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 50.0,
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 60.0,
-                                height: 30.0,
-                                child: Image.memory(
-                                  installedApps[index]['icon'],
-                                ),
-                              ),
-                              Expanded(
-                                  child: CheckboxListTile(
-                                key: UniqueKey(),
-                                title: Text(
-                                  installedApps[index]['label'],
-                                  style: TextStyle(
-                                      fontFamily: 'Publica Sans',
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 13.0,
-                                      color: colorBlack10),
-                                ),
-                                activeColor: colorPink,
-                                value: listItensStateAppList[index],
-                                onChanged: (value) {
-                                  if (value == true) {
-                                    setState(() {
-                                      globals.countItensActives++;
-                                      listItensStateAppList[index] = value;
-                                    });
-                                  }
-                                  if (value == false) {
-                                    setState(() {
-                                      globals.countItensActives--;
-                                      listItensStateAppList[index] = value;
-                                    });
-                                  }
-                                  print(globals.countItensActives);
-                                },
+              return AnimatedCard(
+                  child: Slidable(
+                      actionPane: SlidableDrawerActionPane(),
+                      child: Column(
+                        children: <Widget>[
+                          Divider(
+                            color: Colors.black26,
+                            height: 0,
+                          ),
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 50.0,
+                              child: Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 60.0,
+                                    height: 30.0,
+                                    child: Image.memory(
+                                      installedApps[index]['icon'],
+                                    ),
+                                  ),
+                                  Expanded(
+                                      child: CheckboxListTile(
+                                    key: UniqueKey(),
+                                    title: Text(
+                                      installedApps[index]['label'],
+                                      style: TextStyle(
+                                          fontFamily: 'Publica Sans',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 13.0,
+                                          color: colorBlack10),
+                                    ),
+                                    activeColor: colorPink,
+                                    value: listItensStateAppList[index],
+                                    onChanged: (value) {
+                                      if (value == true) {
+                                        setState(() {
+                                          globals.countItensActives++;
+                                          listItensStateAppList[index] = value;
+                                        });
+                                      }
+                                      if (value == false) {
+                                        setState(() {
+                                          globals.countItensActives--;
+                                          listItensStateAppList[index] = value;
+                                        });
+                                      }
+                                      print(globals.countItensActives);
+                                    },
+                                  )),
+                                ],
                               )),
-                            ],
-                          )),
-                    ],
-                  ));
+                        ],
+                      )));
             }),
       ),
       FlatButton(

@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:house_of_caju/theme/style.dart';
 import 'package:house_of_caju/models/route.dart';
 import 'package:launcher_assist/launcher_assist.dart';
 import 'components/components.dart';
 import 'package:house_of_caju/models/data.dart' as globals;
 import 'package:house_of_caju/screens/smartbagPageScreen/smartbag.dart';
+import 'package:house_of_caju/BackgroundCollectingTask.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -16,6 +20,20 @@ double mainGlobalHeigthScreen;
 int selectedIndex = 0;
 
 class _MainScreenState extends State<MainScreen> {
+  //BLUETOOTH
+  BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
+
+  String _address = "...";
+  String _name = "...";
+
+  Timer _discoverableTimeoutTimer;
+  int _discoverableTimeoutSecondsLeft = 0;
+
+  BackgroundCollectingTask _collectingTask;
+
+  bool _autoAcceptPairingRequests = false;
+  //BLUETOOTH
+
   final GlobalKey<ScaffoldState> _scaffoldFinalKey =
       new GlobalKey<ScaffoldState>();
 
@@ -31,6 +49,58 @@ class _MainScreenState extends State<MainScreen> {
         installedApps = apps;
       });
     });
+
+    // BLUETOOTH
+    // Get current state
+    FlutterBluetoothSerial.instance.state.then((state) {
+      setState(() {
+        _bluetoothState = state;
+      });
+    });
+
+    Future.doWhile(() async {
+      // Wait if adapter not enabled
+      if (await FlutterBluetoothSerial.instance.isEnabled) {
+        return false;
+      }
+      await Future.delayed(Duration(milliseconds: 0xDD));
+      return true;
+    }).then((_) {
+      // Update the address field
+      FlutterBluetoothSerial.instance.address.then((address) {
+        setState(() {
+          _address = address;
+        });
+      });
+    });
+
+    FlutterBluetoothSerial.instance.name.then((name) {
+      setState(() {
+        _name = name;
+      });
+    });
+
+    // Listen for futher state changes
+    FlutterBluetoothSerial.instance
+        .onStateChanged()
+        .listen((BluetoothState state) {
+      setState(() {
+        _bluetoothState = state;
+
+        // Discoverable mode is disabled when Bluetooth gets disabled
+        _discoverableTimeoutTimer = null;
+        _discoverableTimeoutSecondsLeft = 0;
+      });
+    });
+    // BLUETOOTH
+  }
+
+  @override
+  void dispose() {
+    FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+    _collectingTask?.dispose();
+    _discoverableTimeoutTimer?.cancel();
+    super.dispose();
   }
 
   void onItemTapped(int index) {
@@ -41,6 +111,16 @@ class _MainScreenState extends State<MainScreen> {
       }
     });
   }
+    
+  void testConnectionBluetooth() async {
+    bool ifIsAvailable = await FlutterBluetoothSerial.instance.isEnabled;
+    if(ifIsAvailable){
+      globals.valueStateSmartbagBluetooth = true;
+    }else{
+      globals.valueStateSmartbagBluetooth = false;
+    }
+    print(ifIsAvailable);
+  }
 
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -49,6 +129,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     globals.globalBuildContextMainScreen = context;
     globals.selectedIndexGlobal = selectedIndex;
+    testConnectionBluetooth();
 
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);

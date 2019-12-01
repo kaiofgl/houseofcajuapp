@@ -11,6 +11,6 @@ BuildContext globalBuildContextMainScreen;
 
 bool valueStateLedNotification = false;
 bool valueStateSmartbagBluetooth = false;
-
+Color secondColorContainerAnimated = Color(0xFF00CCFF);
 var results;
 

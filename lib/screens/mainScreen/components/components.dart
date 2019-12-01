@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:house_of_caju/components/bluetooth/components/DiscoveryPage.dart';
 import 'package:house_of_caju/theme/style.dart';
 
 import 'package:house_of_caju/models/data.dart' as globals;
@@ -76,12 +78,11 @@ class _SideBarStfulWidgetState extends State<SideBarStfulWidget> {
                   inactiveTrackColor: colorBlack10,
                   value: globals.valueStateLedNotification,
                   onChanged: (value) {
-                  
                     print(globals.valueStateSmartbagBluetooth);
                     setState(() {
-                      if(globals.valueStateSmartbagBluetooth == false){
-                          globals.valueStateLedNotification = true;
-                          globals.valueStateSmartbagBluetooth = true;
+                      if (globals.valueStateSmartbagBluetooth == false) {
+                        globals.valueStateLedNotification = true;
+                        globals.valueStateSmartbagBluetooth = true;
                       }
                       globals.valueStateLedNotification = value;
                     });
@@ -120,9 +121,22 @@ class _SideBarStfulWidgetState extends State<SideBarStfulWidget> {
                   inactiveTrackColor: colorBlack10,
                   value: globals.valueStateSmartbagBluetooth,
                   onChanged: (value) {
-                    setState(() {
-                      globals.valueStateSmartbagBluetooth = value;
-                      globals.valueStateLedNotification = value;
+                    future() async {
+                      if (value) {
+                        print(value);
+                        await FlutterBluetoothSerial.instance.requestEnable();
+                      } else {
+                        print(value);
+                        print("value");
+                        await FlutterBluetoothSerial.instance.requestDisable();
+                      }
+                    }
+
+                    future().then((_) {
+                      setState(() {
+                        globals.valueStateSmartbagBluetooth = value;
+                        globals.valueStateLedNotification = value;
+                      });
                     });
                   },
                 ),
@@ -134,12 +148,18 @@ class _SideBarStfulWidgetState extends State<SideBarStfulWidget> {
           color: Colors.black26,
           height: 0,
         ),
-        clickButtonSub(context,"PÁGINA SMARTBAG", Icon(Icons.wifi), () {
+        clickButtonSub(context, "PÁGINA SMARTBAG", Icon(Icons.wifi), () {
           print('kkk');
         }),
-        clickButtonSub(context,
-            "CONECTAR NOVA SMARTBAG", Icon(Icons.bluetooth_searching), () {
-          print("KKKK SMARTBAG");
+        clickButtonSub(
+            context, "CONECTAR NOVA SMARTBAG", Icon(Icons.bluetooth_searching),
+            () {
+          print("CONECTAR");
+          showDialog(
+              context: context,
+              builder: (context) {
+                return ScreenDart();
+              });
         }),
       ],
     );
@@ -147,8 +167,8 @@ class _SideBarStfulWidgetState extends State<SideBarStfulWidget> {
 }
 
 @override
-Widget clickButtonSub(BuildContext context, String receivedTextButton, Icon iconReceivedButton,
-    Function receivedFuncion) {
+Widget clickButtonSub(BuildContext context, String receivedTextButton,
+    Icon iconReceivedButton, Function receivedFuncion) {
   double widthChildContainer = 35.0;
   double widthBorder = 2.0;
   return Column(
@@ -156,10 +176,7 @@ Widget clickButtonSub(BuildContext context, String receivedTextButton, Icon icon
       Container(
         child: FlatButton(
           key: UniqueKey(),
-          onPressed: () {
-         
-            globals.selectedIndexGlobal = 2;
-          },
+          onPressed: receivedFuncion,
           child: Container(
             height: 35.0,
             decoration: new BoxDecoration(
