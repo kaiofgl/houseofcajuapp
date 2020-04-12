@@ -16,6 +16,8 @@ double heights = globals.heightGlobal;
 double widths = globals.widthGlobal;
 
 class _SideBarStfulWidgetState extends State<SideBarStfulWidget> {
+
+
   bool stateTapButton = false;
 
   @override

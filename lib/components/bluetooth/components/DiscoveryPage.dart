@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:typed_data';
 
 import 'package:animated_card/animated_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:house_of_caju/theme/style.dart';
+import 'package:house_of_caju/models/data.dart' as globals;
 
 class ScreenDart extends StatefulWidget {
   final bool start;
@@ -147,7 +148,9 @@ class _ScreenDartState extends State<ScreenDart> {
                                   size: 19,
                                 ),
                                 Text(
-                                  (!bonded) ? "CONECTAR" : "DESCONECTAR",
+                                  (result.device.isBonded)
+                                      ? "CONECTAR"
+                                      : "PAREAR",
                                   style: TextStyle(
                                       fontFamily: 'Publica Sans',
                                       fontWeight: FontWeight.w400,
@@ -156,20 +159,31 @@ class _ScreenDartState extends State<ScreenDart> {
                               ],
                             ),
                             onPressed: () async {
-                              connection = await BluetoothConnection.toAddress(
-                                  result.device.address);
+                              // if (globals.stateConnectedApp == true) {
+                              //   globals.connectedApp.close();
+                              // }
 
+                              globals.connectedApp =
+                                  await BluetoothConnection.toAddress(
+                                      result.device.address);
+                              setState(() {
+                                globals.stateConnectedApp = true;
+                              });
+                              // print(globals.connectedApp.isConnected);
+                              globals.connectedApp.output
+                                  .add(utf8.encode("successfullyconnected"));
 
-                              Future.delayed(Duration(milliseconds: 333))
-                                  .then((_) async {
-                                connection.output 
-                                    .add(utf8.encode("TESTE 1 3 6 9"));
-                                await connection.output.allSent;
-                                print("SEND ALL");
-                                print(connection);
-                                setState(() {
-                                  // connection;
-                                });
+                              globals.connectedApp.input
+                                  .listen((Uint8List data) {
+                                String dataReceived =
+                                    ascii.decode(data).toString();
+                                if (dataReceived == "c") {
+                                  globals.connectedApp.output.add(
+                                      utf8.encode("successfullyconnected"));
+                                  print("RECALL");
+                                }
+                              }).onDone(() {
+                                print("FINALIZADO");
                               });
                             },
                           ),
@@ -189,9 +203,13 @@ class _ScreenDartState extends State<ScreenDart> {
       ),
       FlatButton(
         onPressed: () async {
-          print(connection);
+          print(globals.connectedApp);
+
+          globals.connectedApp.output.add(utf8.encode("red: 244"));
+          await globals.connectedApp.output.allSent;
+          print("SEND ALL");
         },
-        child: Text("oi"),
+        child: Text("debug test"),
       ),
       FlatButton(
         key: UniqueKey(),

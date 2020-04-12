@@ -32,6 +32,7 @@ dependencies:
   scoped_model: ^1.0.1
   animated_card: ^1.0.0+8
   cloud_firestore: ^0.12.10+2
+  notifications: ^0.0.3
   
 dev_dependencies:
   flutter_test:

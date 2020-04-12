@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:house_of_caju/theme/style.dart';
 import 'package:house_of_caju/models/route.dart';
 import 'package:launcher_assist/launcher_assist.dart';
+import 'package:notifications/notifications.dart';
 import 'components/components.dart';
 import 'package:house_of_caju/models/data.dart' as globals;
 import 'package:house_of_caju/screens/smartbagPageScreen/smartbag.dart';
@@ -20,6 +23,9 @@ double mainGlobalHeigthScreen;
 int selectedIndex = 0;
 
 class _MainScreenState extends State<MainScreen> {
+  Notifications _notifications;
+  StreamSubscription<NotificationEvent> _subscription;
+
   //BLUETOOTH
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
 
@@ -43,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-
+    initPlatformState();
     LauncherAssist.getAllApps().then((apps) {
       setState(() {
         installedApps = apps;
@@ -92,7 +98,39 @@ class _MainScreenState extends State<MainScreen> {
         _discoverableTimeoutSecondsLeft = 0;
       });
     });
+
     // BLUETOOTH
+  }
+
+// Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    startListening();
+  }
+
+  void onData(NotificationEvent event) {
+    print(event.packageName.toString());
+    globals.results['social'].forEach((k) {
+      if (k['package'] == event.packageName.toString()) {
+        print("TRUE");
+        String stringToBluetoothNotification =
+            "${k['red']}, ${k['green']}, ${k['blue']}";
+        globals.connectedApp.output
+            .add(utf8.encode(stringToBluetoothNotification));
+      }
+    }); // }
+  }
+
+  void startListening() {
+    _notifications = new Notifications();
+    try {
+      _subscription = _notifications.stream.listen(onData);
+    } on Error catch (exception) {
+      print(exception);
+    }
+  }
+
+  void stopListening() {
+    _subscription.cancel();
   }
 
   @override
@@ -111,12 +149,12 @@ class _MainScreenState extends State<MainScreen> {
       }
     });
   }
-    
+
   void testConnectionBluetooth() async {
     bool ifIsAvailable = await FlutterBluetoothSerial.instance.isEnabled;
-    if(ifIsAvailable){
+    if (ifIsAvailable) {
       globals.valueStateSmartbagBluetooth = true;
-    }else{
+    } else {
       globals.valueStateSmartbagBluetooth = false;
     }
     print(ifIsAvailable);

@@ -299,9 +299,9 @@ class _StateSmartBagPageRouteState extends State<StateSmartBagPageRoute> {
                         fontSize: 12.0),
                   ),
                   Text(
-                      (globals.valueStateSmartbagBluetooth)
+                      (globals.stateConnectedApp)
                           ? "CONECTADA"
-                          : "DESCONECTADA",
+                          : (globals.valueStateSmartbagBluetooth) ? "AGUARDANDO..." : "DESCONECTADO",
                       style: TextStyle(
                           fontFamily: 'Publica Sans',
                           fontWeight: FontWeight.w400,

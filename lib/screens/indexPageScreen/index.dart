@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:house_of_caju/components/bluetooth/components/DiscoveryPage.dart';
-
+import 'package:house_of_caju/models/data.dart' as globals;
 class StateIndexPageRoute extends StatefulWidget {
   @override
   _StateIndexPageRouteState createState() => _StateIndexPageRouteState();
@@ -23,7 +25,14 @@ class _StateIndexPageRouteState extends State<StateIndexPageRoute> {
         alignment: Alignment.center,
       ),
       Container(
-        child: Text("FUCK DA POLISAA"),
+        child: FlatButton(
+          child: Text("debuger"),
+          onPressed: () async {
+            globals.connectedApp.output.add(utf8.encode("DEBUG: 103"));
+            await globals.connectedApp.output.allSent;
+            print("SEND ALL");
+          },
+        ),
       )
     ]);
   }
